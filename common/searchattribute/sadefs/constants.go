@@ -40,6 +40,9 @@ const (
 	Memo              = "Memo"
 	VisibilityTaskKey = "VisibilityTaskKey"
 
+	// A visibility document field, not a search attribute: StartTime minus any skipped time the execution inherited.
+	TemporalCreateTime = "TemporalCreateTime"
+
 	// Added to workflows started by a schedule.
 	TemporalScheduledStartTime = "TemporalScheduledStartTime"
 	TemporalScheduledById      = "TemporalScheduledById"
