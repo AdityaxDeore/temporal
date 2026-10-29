@@ -68,6 +68,9 @@ func sanitizeExecutionInfo(
 	// Timer tasks are generated locally, do not sync them.
 	executionInfo.StateMachineTimers = nil
 	executionInfo.TaskGenerationShardClockTimestamp = common.EmptyEventTaskID
+
+	// Persistence metadata describes this cluster's storage of the execution.
+	executionInfo.PersistenceMetadata = nil
 }
 
 func sanitizeChildExecutionInfo(
