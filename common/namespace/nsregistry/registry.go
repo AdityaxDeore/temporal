@@ -54,6 +54,10 @@ const (
 	CacheRefreshPageSize             = 1000
 	readthroughCacheTTL              = 1 * time.Second // represents minimum time to wait before trying to readthrough again
 	readthroughTimeout               = 3 * time.Second
+	// refreshTimeout bounds a full namespace refresh, including all
+	// ListNamespaces pages, so a silent persistence connection cannot
+	// block watch reconnection, polling, or shutdown indefinitely.
+	refreshTimeout = 10 * time.Second
 	// startWatchMaxAttempts limits initial watch setup retries to avoid blocking
 	// server startup indefinitely if persistence is temporarily unavailable.
 	startWatchMaxAttempts = 10
@@ -556,6 +560,9 @@ func (r *registry) runPollingLoop(ctx context.Context) error {
 }
 
 func (r *registry) refreshNamespaces(ctx context.Context) (err error) {
+	ctx, cancel := context.WithTimeout(ctx, refreshTimeout)
+	defer cancel()
+
 	start := time.Now()
 	defer func() {
 		if err != nil {
@@ -572,8 +579,6 @@ func (r *registry) refreshNamespaces(ctx context.Context) (err error) {
 	namespaceIDsDb := make(map[namespace.ID]struct{})
 
 	for {
-		// TODO: consider adding a timeout and/or retries here - long ListNamespaces
-		// calls could delay watch reconnection or block shutdown
 		response, err := r.persistence.ListNamespaces(ctx, request)
 		if err != nil {
 			return err

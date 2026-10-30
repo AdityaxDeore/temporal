@@ -241,7 +241,9 @@ func (w *fairTaskWriter) writeBatch(reqs []*writeTaskRequest) (retErr error) {
 	defer func() { unpin(retErr) }()
 
 	w.pickPasses(reqs, bases)
-	resp, err := w.db.CreateFairTasks(w.backlogMgr.tqCtx, reqs)
+	ctx, cancel := context.WithTimeout(w.backlogMgr.tqCtx, ioTimeout)
+	defer cancel()
+	resp, err := w.db.CreateFairTasks(ctx, reqs)
 	if err == nil {
 		w.backlogMgr.wroteNewTasks(resp) // must be called before unpin()
 	} else {

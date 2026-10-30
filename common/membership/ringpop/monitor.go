@@ -266,6 +266,9 @@ func (rpo *monitor) upsertMyMembership(
 	ctx context.Context,
 	request *persistence.UpsertClusterMembershipRequest,
 ) error {
+	ctx, cancel := context.WithTimeout(ctx, persistenceOperationTimeout)
+	defer cancel()
+
 	err := rpo.metadataManager.UpsertClusterMembership(ctx, request)
 
 	if err == nil {

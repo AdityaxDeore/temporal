@@ -2,6 +2,10 @@ log:
   stdout: true
   level: info
 
+# NOTE: for production PostgreSQL deployments, prefer pluginName
+# "postgres12_pgx" over "postgres12": the lib/pq driver can block
+# indefinitely on a connection that goes silent without a reset, even when
+# the call has a deadline, while the pgx driver honors context cancellation.
 persistence:
   defaultStore: postgres-default
   visibilityStore: postgres-visibility
